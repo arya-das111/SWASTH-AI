@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div align="center">
 
 # 🌟 Swasth AI 🌟
@@ -194,3 +195,7 @@ ALL SYSTEMS OPERATIONAL - READY FOR PROVISIONING
 
 ## 📝 License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+=======
+# SWASTH-AI
+AI-driven predictive logistics and resource oversight platform for rural Primary/Community Health Centres in India. Features stockout forecasting, geotargeted drug redistribution, offline-first PWA, geofenced attendance tracking, and ABDM/FHIR R4 + DPDP compliance.
+>>>>>>> ff83b1308121ef5e51228d66c800cf16650d60d7
