@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: swasth_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./swasth.db
+      - REDIS_URL=redis://redis:6379/0
+      - SARVAM_API_KEY=${SARVAM_API_KEY:-}
+    volumes:
+      - ./apps/api:/app
+    depends_on:
+      - redis
+    networks:
+      - swasth_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: swasth_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - swasth_network
+
+  web_pwa:
+    image: nginx:alpine
+    container_name: swasth_web_pwa
+    ports:
+      - "3000:80"
+    volumes:
+      - ./apps/web/dist:/usr/share/nginx/html
+    networks:
+      - swasth_network
+
+  admin_dashboard:
+    image: nginx:alpine
+    container_name: swasth_admin_dashboard
+    ports:
+      - "3001:80"
+    volumes:
+      - ./apps/dashboard/dist:/usr/share/nginx/html
+    networks:
+      - swasth_network
+
+networks:
+  swasth_network:
+    driver: bridge

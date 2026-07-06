@@ -1,0 +1,14 @@
+{
+  "name": "swasth-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:dashboard": "npm run dev -w apps/dashboard",
+    "dev:api": "python apps/api/main.py",
+    "seed": "python data/seed/seed.py"
+  }
+}
