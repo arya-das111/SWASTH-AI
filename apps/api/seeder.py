@@ -357,13 +357,13 @@ def seed_database_if_empty():
                     avail = "unavailable"
                     reagent = 0
                     
-                da = models.DiagnosticTestAvailability(
+                da = models.DiagnosticAudit(
                     facility_id=f.facility_id,
                     test_id=t.test_id,
                     status=avail,
                     reagent_stock=reagent,
-                    last_checked=datetime.now() - timedelta(days=random.randint(0, 2)),
-                    checked_by=facility_staff_map[f.facility_id][2].staff_id
+                    audit_date=date.today() - timedelta(days=random.randint(0, 2)),
+                    auditor_id=facility_staff_map[f.facility_id][2].staff_id
                 )
                 db.add(da)
         db.commit()
