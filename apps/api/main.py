@@ -33,6 +33,9 @@ with engine.connect() as conn:
     except Exception:
         pass
 
+import seeder
+seeder.seed_database_if_empty()
+
 
 app = FastAPI(
     title="Swasth AI API",
