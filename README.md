@@ -164,6 +164,16 @@ Package and run the entire microservices cluster:
 docker-compose up --build
 ```
 
+### 🌐 Live Production Deployments
+* **Oversight Command Panel (Dashboard):** [https://swasth-ai-dashboard-dho.vercel.app](https://swasth-ai-dashboard-dho.vercel.app)
+* **Frontline Health Center Portal (PWA):** [https://swasth-ai-portal.vercel.app](https://swasth-ai-portal.vercel.app)
+* **Serverless REST API (Backend):** [https://api-gamma-pearl.vercel.app](https://api-gamma-pearl.vercel.app)
+
+### ☁️ Cloud Architecture & Serverless Configuration
+* **Serverless Backend:** Deployed to Vercel Serverless Functions. Utilizes a `/tmp` writable directory lock bypass to maintain an active SQLite database within ephemeral lambda environments.
+* **Auto-Seeding Engine:** Built-in cold-start seeder dynamically populates all necessary database structures (BedStatus, Attendance rosters, Stock, and redistribution suggestions) upon container initialization.
+* **Dynamic CORS Whitelisting:** Configured using regex whitelists to securely authorize cross-origin resource queries from all Vercel subdomain configurations.
+
 ---
 
 ## 🧪 Unified Integration Verification
@@ -195,6 +205,3 @@ ALL SYSTEMS OPERATIONAL - READY FOR PROVISIONING
 
 ## 📝 License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-=======
-# SWASTH-AI
-AI-driven predictive logistics and resource oversight platform for rural Primary/Community Health Centres in India. Features stockout forecasting, geotargeted drug redistribution, offline-first PWA, geofenced attendance tracking, and ABDM/FHIR R4 + DPDP compliance.
