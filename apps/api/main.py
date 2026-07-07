@@ -80,6 +80,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def read_root():
+    return {
+        "name": "Swasth AI API Service",
+        "status": "active",
+        "documentation": "/docs",
+        "health": "/health"
+    }
+
 @app.get("/health")
 @app.get("/api/v1/health")
 def health_check(db: Session = Depends(get_db)):
