@@ -2,9 +2,12 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Locate the database file at the workspace root
+# Locate the database file at the workspace root or /tmp for Vercel
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT_DB = f"sqlite:///{os.path.join(BASE_DIR, 'swasth_ai.db')}"
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+    DEFAULT_DB = "sqlite:////tmp/swasth_ai.db"
+else:
+    DEFAULT_DB = f"sqlite:///{os.path.join(BASE_DIR, 'swasth_ai.db')}"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DB)
 
 if DATABASE_URL.startswith("postgres://"):
