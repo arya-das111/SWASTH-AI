@@ -289,6 +289,131 @@ def seed_database_if_empty():
                 )
                 db.add(rec)
         db.commit()
+        
+        # 6. Seed Attendance Records (past 7 days + today)
+        print("Auto-seeding Attendance & Roster logs...")
+        for f in db_facilities:
+            staff_list = facility_staff_map[f.facility_id]
+            for d in range(7):
+                current_date = date.today() - timedelta(days=d)
+                for s in staff_list:
+                    # Let's simulate some absences
+                    status = "present"
+                    # Create absenteeism warning: Sister Geeta has > 3 absences
+                    if s.name.startswith("Sister Geeta") and d in [1, 3, 5]:
+                        status = "absent"
+                    # Create Doctor Coverage Gap today (d=0) for Mohanlalganj PHC 1
+                    elif s.role == "medical_officer" and d == 0 and "Mohanlalganj PHC" in f.name:
+                        status = "absent"
+                    
+                    att = models.AttendanceRecord(
+                        facility_id=f.facility_id,
+                        staff_id=s.staff_id,
+                        attendance_date=current_date,
+                        status=status,
+                        check_in_time=datetime.now() - timedelta(hours=random.randint(8, 12)) if status == "present" else None,
+                        check_out_time=datetime.now() - timedelta(hours=random.randint(1, 4)) if status == "present" else None,
+                        source="app"
+                    )
+                    db.add(att)
+        db.commit()
+
+        # 7. Seed Bed Status snapshots
+        print("Auto-seeding Wards & Bed logs...")
+        for f in db_facilities:
+            wards = ["General", "Maternity"]
+            if f.type == "CHC":
+                wards.extend(["Pediatric", "ICU"])
+            
+            for w in wards:
+                tot_beds = 15 if w == "General" else 8
+                if f.type == "PHC":
+                    tot_beds = 5 if w == "General" else 2
+                
+                occupied = random.randint(1, tot_beds - 1)
+                # Create a bed turnover spike warning for Chinhat CHC General Ward
+                if f.name == "Chinhat CHC" and w == "General":
+                    occupied = tot_beds - 1
+                    
+                bs = models.BedStatus(
+                    facility_id=f.facility_id,
+                    ward_type=w,
+                    total_beds=tot_beds,
+                    occupied_beds=occupied,
+                    timestamp=datetime.now() - timedelta(hours=random.randint(2, 6))
+                )
+                db.add(bs)
+        db.commit()
+
+        # 8. Seed Diagnostics Test Availability
+        print("Auto-seeding Diagnostics Test Availability...")
+        for f in db_facilities:
+            for t in db_tests:
+                # Randomly mark some mandated tests as unavailable to trigger compliance gaps
+                avail = "available"
+                reagent = random.randint(20, 200)
+                if t.is_mandated and random.random() < 0.15:
+                    avail = "unavailable"
+                    reagent = 0
+                    
+                da = models.DiagnosticTestAvailability(
+                    facility_id=f.facility_id,
+                    test_id=t.test_id,
+                    status=avail,
+                    reagent_stock=reagent,
+                    last_checked=datetime.now() - timedelta(days=random.randint(0, 2)),
+                    checked_by=facility_staff_map[f.facility_id][2].staff_id
+                )
+                db.add(da)
+        db.commit()
+
+        # 9. Seed AI Stock Redistribution Recommendations
+        print("Auto-seeding AI Stock Redistribution suggestions...")
+        # We need surplus items
+        chinhat_chc = next(x for x in db_facilities if x.name == "Chinhat CHC")
+        kakori_phc = next(x for x in db_facilities if x.name == "Kakori PHC 1")
+        
+        # Retrieve or find matching medicine
+        para_sku = db.query(models.StockItem).filter(
+            models.StockItem.facility_id == chinhat_chc.facility_id,
+            models.StockItem.medicine_name == "Paracetamol 500mg"
+        ).first()
+        
+        if para_sku:
+            reco = models.Recommendation(
+                source_facility_id=chinhat_chc.facility_id,
+                target_facility_id=kakori_phc.facility_id,
+                sku_id=para_sku.sku_id,
+                medicine_name="Paracetamol 500mg",
+                generic_name="Paracetamol",
+                transfer_quantity=200,
+                rationale="Chinhat CHC has surplus Paracetamol stock (850 units) projecting 400+ days supply. Kakori PHC 1 is below safety threshold (42 units) with projected stockout in 6 days.",
+                distance_km=18.4,
+                status="pending",
+                created_at=datetime.now() - timedelta(hours=4)
+            )
+            db.add(reco)
+            
+        # Seed another recommendation for ORS
+        ors_sku = db.query(models.StockItem).filter(
+            models.StockItem.facility_id == chinhat_chc.facility_id,
+            models.StockItem.medicine_name == "ORS Powder 20.5g"
+        ).first()
+        if ors_sku:
+            reco2 = models.Recommendation(
+                source_facility_id=chinhat_chc.facility_id,
+                target_facility_id=kakori_phc.facility_id,
+                sku_id=ors_sku.sku_id,
+                medicine_name="ORS Powder 20.5g",
+                generic_name="Oral Rehydration Salts",
+                transfer_quantity=150,
+                rationale="Chinhat CHC holds surplus ORS sachets (620 units). Kakori PHC 1 has high footfall load with near stockout status.",
+                distance_km=18.4,
+                status="pending",
+                created_at=datetime.now() - timedelta(hours=2)
+            )
+            db.add(reco2)
+        db.commit()
         print("Auto-seeding completed successfully!")
         
     except Exception as e:

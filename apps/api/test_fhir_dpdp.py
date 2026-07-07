@@ -55,11 +55,17 @@ def test_fhir_dpdp():
 
     # 4. Test DPDP Data Access Request
     # We query the facility staff list to get a valid staff_id
-    staff_list_res = client.get(f"/api/v1/facilities/{fac_id}/staff", headers=auth_headers)
-    assert staff_list_res.status_code == 200
-    staff_members = staff_list_res.json()
-    assert len(staff_members) > 0
-    staff_id = staff_members[0]["staff_id"]
+    staff_id = None
+    for f in facilities:
+        curr_fac_id = f["facility_id"]
+        staff_list_res = client.get(f"/api/v1/facilities/{curr_fac_id}/staff", headers=auth_headers)
+        if staff_list_res.status_code == 200:
+            staff_members = staff_list_res.json()
+            if len(staff_members) > 0:
+                staff_id = staff_members[0]["staff_id"]
+                break
+                
+    assert staff_id is not None, "No active staff member found in any facility to run DPDP tests"
     
     print(f"Executing DPDP Access Request for staff: {staff_id}...")
     access_res = client.get(f"/api/v1/dpdp/requests/access?staff_id={staff_id}", headers=auth_headers)
