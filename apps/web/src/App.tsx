@@ -5,7 +5,9 @@ import {
   LogOut, Check, AlertOctagon, Wifi, WifiOff 
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8000/api/v1';
+const API_BASE = window.location.hostname.includes('vercel.app')
+  ? 'https://api-gamma-pearl.vercel.app/api/v1'
+  : 'http://localhost:8000/api/v1';
 
 // Static translation dictionary to enable instant hot-swapping
 const STATIC_DICT: any = {
