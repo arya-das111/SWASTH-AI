@@ -390,7 +390,7 @@ def seed_database_if_empty():
                 rationale="Chinhat CHC has surplus Paracetamol stock (850 units) projecting 400+ days supply. Kakori PHC 1 is below safety threshold (42 units) with projected stockout in 6 days.",
                 distance_km=18.4,
                 status="pending",
-                created_at=datetime.now() - timedelta(hours=4)
+                generated_at=datetime.now() - timedelta(hours=4)
             )
             db.add(reco)
             
@@ -409,7 +409,7 @@ def seed_database_if_empty():
                 rationale="Chinhat CHC holds surplus ORS sachets (620 units). Kakori PHC 1 has high footfall load with near stockout status.",
                 distance_km=18.4,
                 status="pending",
-                created_at=datetime.now() - timedelta(hours=2)
+                generated_at=datetime.now() - timedelta(hours=2)
             )
             db.add(reco2)
         db.commit()
