@@ -310,9 +310,10 @@ def seed_database_if_empty():
                         facility_id=f.facility_id,
                         staff_id=s.staff_id,
                         attendance_date=current_date,
+                        role=s.role,
                         status=status,
-                        check_in_time=datetime.now() - timedelta(hours=random.randint(8, 12)) if status == "present" else None,
-                        check_out_time=datetime.now() - timedelta(hours=random.randint(1, 4)) if status == "present" else None,
+                        check_in_at=datetime.now() - timedelta(hours=random.randint(8, 12)) if status == "present" else None,
+                        check_out_at=datetime.now() - timedelta(hours=random.randint(1, 4)) if status == "present" else None,
                         source="app"
                     )
                     db.add(att)
