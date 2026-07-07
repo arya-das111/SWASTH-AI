@@ -84,7 +84,12 @@ const STATIC_DICT: any = {
     "Attendance rate:": "उपस्थिति दर:",
     "Bed Turnover:": "बिस्तर टर्नओवर:",
     "Diagnostics Compliance:": "नैदानिक अनुपालन:",
-    "Diagnostic Explainer:": "नैदानिक स्पष्टीकरण:"
+    "Diagnostic Explainer:": "नैदानिक स्पष्टीकरण:",
+    "Outbreak Hotspots": "आउटब्रेक हॉटस्पॉट",
+    "Disease Outbreak Hotspot Prediction": "रोग प्रकोप हॉटस्पॉट पूर्वानुमान",
+    "Analyzing rolling 14-day patient footfall logs to identify localized epidemic surges and project transmission patterns.": "स्थानीय महामारी के प्रकोप की पहचान करने के लिए 14-दिन के रोगी संख्या लॉग का विश्लेषण।",
+    "Suspected Outbreak": "संदिग्ध प्रकोप",
+    "Recommended Actions:": "अनुशंसित कार्रवाई:"
   },
   "ta-IN": {
     "Lucknow Command Oversight Panel": "லக்னோ கட்டளை கண்காணிப்பு குழு",
@@ -159,7 +164,12 @@ const STATIC_DICT: any = {
     "Attendance rate:": "வருகை விகிதம்:",
     "Bed Turnover:": "படுக்கை சுழற்சி:",
     "Diagnostics Compliance:": "கண்டறிதல் இணக்கம்:",
-    "Diagnostic Explainer:": "தணிக்கை விளக்கம்:"
+    "Diagnostic Explainer:": "தணிக்கை விளக்கம்:",
+    "Outbreak Hotspots": "தொற்றுநோய் ஹாட்ஸ்பாட்கள்",
+    "Disease Outbreak Hotspot Prediction": "நோய் பரவல் ஹாட்ஸ்பாட் கணிப்பு",
+    "Analyzing rolling 14-day patient footfall logs to identify localized epidemic surges and project transmission patterns.": "உள்ளூர் தொற்றுநோய் பரவலைக் கண்டறிய 14-நாள் நோயாளி வருகைப் பதிவை பகுப்பாய்வு செய்கிறது.",
+    "Suspected Outbreak": "சந்தேகிக்கப்படும் தொற்று",
+    "Recommended Actions:": "பரிந்துரைக்கப்பட்ட நடவடிக்கைகள்:"
   }
 };
 
@@ -194,6 +204,7 @@ export default function App() {
   const [anomalies, setAnomalies] = useState<any[]>([]);
   const [anomalyStats, setAnomalyStats] = useState<any>(null);
   const [facilityScores, setFacilityScores] = useState<any[]>([]);
+  const [hotspots, setHotspots] = useState<any[]>([]);
   
   // State Data
   const [stateDashboard, setStateDashboard] = useState<any>(null);
@@ -299,6 +310,11 @@ export default function App() {
         if (activeTab === 'scores') {
           const res = await fetch(`${API_BASE}/scores/district`, { headers });
           if (res.ok) setFacilityScores(await res.json());
+        }
+
+        if (activeTab === 'hotspots') {
+          const res = await fetch(`${API_BASE}/anomalies/hotspots`, { headers });
+          if (res.ok) setHotspots(await res.json());
         }
       }
     } catch (err) {
@@ -541,6 +557,7 @@ export default function App() {
                     { id: 'gaps', label: t('Attendance & Gaps'), icon: Users },
                     { id: 'compliance', label: t('FDSI Compliance'), icon: Clipboard },
                     { id: 'anomalies', label: t('Early Warnings'), icon: AlertOctagon },
+                    { id: 'hotspots', label: t('Outbreak Hotspots'), icon: Activity },
                     { id: 'scores', label: t('Oversight Scores'), icon: CheckCircle2 }
                   ].map(item => (
                     <button
@@ -1083,6 +1100,71 @@ export default function App() {
                                     </button>
                                   </div>
                                 )}
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'hotspots' && (
+                  <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div className="glass" style={{ padding: '24px' }}>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '10px' }}>{t('Disease Outbreak Hotspot Prediction')}</h3>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                        {t('Analyzing rolling 14-day patient footfall logs to identify localized epidemic surges and project transmission patterns.')}
+                      </p>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', maxHeight: '550px', overflowY: 'auto', padding: '4px' }}>
+                        {hotspots.length === 0 ? (
+                          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+                            {t('No outbreak hotspots or anomalies detected currently.')}
+                          </div>
+                        ) : (
+                          hotspots.map(spot => {
+                            let cardColor = '#10b981';
+                            let bgClass = 'rgba(16, 185, 129, 0.03)';
+                            if (spot.risk_level === 'HIGH') {
+                              cardColor = '#ef4444';
+                              bgClass = 'rgba(239, 68, 68, 0.04)';
+                            } else if (spot.risk_level === 'MODERATE') {
+                              cardColor = '#f59e0b';
+                              bgClass = 'rgba(245, 158, 11, 0.04)';
+                            }
+                            
+                            return (
+                              <div key={spot.facility_id} className="glass" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${cardColor}`, background: bgClass }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <div>
+                                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>{spot.facility_name}</span>
+                                    <span style={{ fontSize: '0.75rem', display: 'block', color: 'var(--text-secondary)' }}>Block: {spot.block} | Type: {spot.type}</span>
+                                  </div>
+                                  <span style={{ padding: '4px 8px', borderRadius: '4px', background: cardColor, color: '#000', fontSize: '0.75rem', fontWeight: 700 }}>
+                                    {spot.risk_level} RISK
+                                  </span>
+                                </div>
+                                
+                                <div style={{ fontSize: '0.85rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: 'rgba(0,0,0,0.02)', padding: '10px', borderRadius: '6px' }}>
+                                  <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>RECENT 7d AVG</span>
+                                    <span style={{ fontWeight: 600 }}>{spot.recent_avg} patients/day</span>
+                                  </div>
+                                  <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>BASELINE AVG</span>
+                                    <span style={{ fontWeight: 600 }}>{spot.baseline_avg} patients/day</span>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>SUSPECTED DIAGNOSIS:</span>
+                                  <span style={{ fontWeight: 600, color: spot.risk_level === 'HIGH' ? '#ef4444' : 'inherit' }}>{t(spot.suspected_outbreak)}</span>
+                                </div>
+                                
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', padding: '12px', background: 'rgba(0,0,0,0.02)', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                                  <strong>{t('Recommended Actions:')}</strong> {t(spot.recommended_actions)}
+                                </div>
                               </div>
                             );
                           })

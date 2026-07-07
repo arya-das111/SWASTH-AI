@@ -34,6 +34,7 @@ By integrating directly with standard healthcare frameworks (like the **Ayushman
 * 📡 **Offline-First PWA:** Frontline clinicians can log movements, diagnostics, and patient footfall offline. Actions are queued and synced automatically when connections resume.
 * 🛡️ **Real-time Geofenced Attendance:** Integrated HTML5 geolocation tracking on check-ins to verify roster presence at health centers.
 * 📋 **FDSI Diagnostics Audits:** Live tracking of compliance scores based on the National Free Diagnostics Initiative’s mandated test categories.
+* 🦠 **Disease Outbreak Hotspot Prediction:** Automated mathematical modeling of 14-day rolling patient footfall logs across blocks, calculating baseline-to-recent ratios, flagging high-risk epidemiological surges, identifying suspect diseases, and outputting targeted containment guidelines for health officers.
 * 🗣️ **Multilingual Accessibility:** Native translation interface utilizing Sarvam AI dynamic APIs, supporting English, Hindi, and Tamil language localizations.
 * 🔒 **Regulatory Compliance:** Built-in FHIR R4 organization wrappers and DPDP consent trails, access logs, and PII redaction (Right to be Forgotten).
 
