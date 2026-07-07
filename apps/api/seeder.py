@@ -412,6 +412,47 @@ def seed_database_if_empty():
                 generated_at=datetime.now() - timedelta(hours=2)
             )
             db.add(reco2)
+        # 10. Seed Active Emergency Alerts
+        print("Auto-seeding Active Emergency Alerts...")
+        # Get facilities
+        chinhat_chc = next(x for x in db_facilities if x.name == "Chinhat CHC")
+        kakori_phc = next(x for x in db_facilities if x.name == "Kakori PHC 1")
+        
+        # Alert 1: Bed saturation at Chinhat
+        alert1 = models.Alert(
+            facility_id=chinhat_chc.facility_id,
+            alert_type="bed_saturation",
+            severity="critical",
+            title="CRITICAL: ICU & GENERAL WARDS SATURATED",
+            message="General Bed occupancy reached 100% capacity (15/15). Diversion protocols activated. All incoming emergency arrivals re-routed to Malihabad CHC.",
+            status="active",
+            generated_at=datetime.now() - timedelta(hours=1)
+        )
+        db.add(alert1)
+        
+        # Alert 2: Outbreak alert at Kakori
+        alert2 = models.Alert(
+            facility_id=kakori_phc.facility_id,
+            alert_type="outbreak_spike",
+            severity="critical",
+            title="EPIDEMIC OUTBREAK ALERT: CHOLERA",
+            message="Acute diarrhea spikes (+250% over baseline) detected in Block Kakori. Water contamination source identified. Distributing ORS & Antibiotic emergency reserve packs.",
+            status="active",
+            generated_at=datetime.now() - timedelta(hours=2)
+        )
+        db.add(alert2)
+        
+        # Alert 3: Critical stockout at Chinhat
+        alert3 = models.Alert(
+            facility_id=chinhat_chc.facility_id,
+            alert_type="stock_out",
+            severity="high",
+            title="EMERGENCY: Paracetamol 500mg SAFETY DEPLETED",
+            message="Safety stock threshold breached. High patient footfall projection. AI redistribution transfer recommended from Gosaiganj CHC.",
+            status="active",
+            generated_at=datetime.now() - timedelta(minutes=45)
+        )
+        db.add(alert3)
         db.commit()
         print("Auto-seeding completed successfully!")
         
